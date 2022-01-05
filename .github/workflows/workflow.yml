@@ -1,0 +1,55 @@
+name: generate preview
+on: push
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout lite-xl
+        uses: actions/checkout@v2
+        with:
+          repository: takase1121/lite-xl
+          ref: color-demo
+          path: lite-xl
+      - name: Checkout lite-xl-colors
+        uses: actions/checkout@v2
+        with:
+          path: colors
+      - name: Get lite-xl ref
+        run: |
+          cd lite-xl
+          echo "lite-xl-ref=$(git rev-parse HEAD)" >> $GITHUB_ENV
+      - name: cache build
+        uses: actions/cache@v2
+        id: cache-build
+        with:
+          path: lite-xl
+          key: lite-xl-${{ runner.os }}-${{ env.lite-xl-ref }}
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -qq imagemagick libfreetype6 libsdl2-2.0
+      - name: Install dev dependencies
+        if: steps.cache-build.outputs.cache-hit != 'true'
+        run: |
+          sudo apt-get install -qq libsdl2-dev libfreetype6-dev meson
+      - name: Build lite-xl
+        if: steps.cache-build.outputs.cache-hit != 'true'
+        run: |
+          cd lite-xl
+          meson setup build --buildtype=release
+          ninja -C build
+          ln -s build/src/lite-xl lite-xl
+          ln -s ../../data build/src/data
+      - name: Generate previews
+        run: |
+          cd colors
+          mkdir -p previews
+          SDL_VIDEODRIVER=dummy ../lite-xl/lite-xl .
+          mogrify -format png previews/*.bmp
+          rm previews/*.bmp
+      - name: Get results
+        uses: actions/upload-artifact@v2
+        with:
+          name: debug
+          path: colors
