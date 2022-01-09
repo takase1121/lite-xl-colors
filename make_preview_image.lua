@@ -1,8 +1,6 @@
 #!/usr/bin/lua
 
-local filename = ...
-local name = filename:match("([^\\/]+)%..*$") .. "_bars"
-
+local filename, name = ...
 
 -- get colors
 local text = io.open(filename):read("*a")
