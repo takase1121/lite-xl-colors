@@ -46,6 +46,7 @@ jobs:
           pushd colors
           mkdir -p "$LITE_XL_PREVIEW_OUTPUT" "previews"
           SDL_VIDEODRIVER=dummy lite-xl .
+          tree
           mogrify -format png "$LITE_XL_PREVIEW_OUTPUT"/*.bmp
           cp "$LITE_XL_PREVIEW_OUTPUT"/*.png previews
           rm -r "$LITE_XL_PREVIEW_OUTPUT"
