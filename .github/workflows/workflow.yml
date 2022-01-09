@@ -55,7 +55,7 @@ jobs:
       - name: Generate Color Bars
         run: |
           pushd colors
-          find colors -type f -name "*.lua" -exec lua make_preview_image.lua {}\;
+          find colors -type f -name "*.lua" -exec lua make_preview_image.lua {} \;
             lua make_preview_image.lua "$f"
           done
           rsync -auvh --include "*.png" --include="*/" --exclude="*" . previews
