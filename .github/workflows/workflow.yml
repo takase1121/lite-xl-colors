@@ -47,7 +47,7 @@ jobs:
           mkdir -p "$LITE_XL_PREVIEW_OUTPUT" "previews"
           SDL_VIDEODRIVER=dummy lite-xl .
           mogrify -format png "$LITE_XL_PREVIEW_OUTPUT"/*.bmp
-          rsync -uhva "$LITE_XL_PREVIEW_OUTPUT/*.png" previews
+          rsync -uhva --include="*.png" --exclude="*" "$LITE_XL_PREVIEW_OUTPUT" previews
           rm -r "$LITE_XL_PREVIEW_OUTPUT"
       - name: create PR
         uses: peter-evans/create-pull-request@v3
