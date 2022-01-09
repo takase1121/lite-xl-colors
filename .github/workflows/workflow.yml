@@ -55,7 +55,7 @@ jobs:
           commit-message: Update README.md and previews
           branch: readme-ci
           path: colors
-          add-paths: README.md previews
+          add-paths: README.md,previews
           delete-branch: false
           title: '[CI] Update README.md and previews'
           body: |
