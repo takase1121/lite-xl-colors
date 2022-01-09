@@ -30,7 +30,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -qq imagemagick libfreetype6 libsdl2-2.0 lua
+          sudo apt-get install -qq imagemagick libfreetype6 libsdl2-2.0 lua5.3
       - name: Restore build
         id: cache
         uses: actions/cache@v2
