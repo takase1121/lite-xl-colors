@@ -3,6 +3,9 @@ name: generate preview
 on:
   push:
     branches: [master]
+    paths-ignore:
+      - 'README.md'
+      - 'previews/**'
 
 jobs:
   previews:
@@ -27,7 +30,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -qq imagemagick libfreetype6 libsdl2-2.0
+          sudo apt-get install -qq imagemagick libfreetype6 libsdl2-2.0 lua
       - name: Restore build
         id: cache
         uses: actions/cache@v2
@@ -49,6 +52,14 @@ jobs:
           mogrify -format png "$LITE_XL_PREVIEW_OUTPUT"/*.bmp
           rsync -auvh --include="*.png" --include="*/" --exclude="*" "$LITE_XL_PREVIEW_OUTPUT" previews
           rm -r "$LITE_XL_PREVIEW_OUTPUT"
+      - name: Generate Color Bars
+        run: |
+          pushd colors
+          find colors -type f -name "*.lua" -exec lua make_preview_image.lua {}\;
+            lua make_preview_image.lua "$f"
+          done
+          rsync -auvh --include "*.png" --include="*/" --exclude="*" . previews
+          rm *.png
       - name: create PR
         uses: peter-evans/create-pull-request@v3
         with:
