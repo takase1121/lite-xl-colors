@@ -1,0 +1,64 @@
+name: generate preview
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  previews:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout lite-xl
+        uses: actions/checkout@v2
+        with:
+          repository: takase1121/lite-xl
+          ref: color-demo
+          path: lite-xl
+      - name: Checkout lite-xl-colors
+        uses: actions/checkout@v2
+        with:
+          path: colors
+      - name: Set Environment Variables
+        run: |
+          pushd lite-xl
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          echo "lite-xl-ref=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+          echo "LITE_XL_PREVIEW_OUTPUT=previews-$(uuidgen)" >> "$GITHUB_ENV"
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -qq imagemagick libfreetype6 libsdl2-2.0
+      - name: Restore build
+        id: cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.local
+          key: lite-xl-${{ runner.os }}-${{ env.lite-xl-ref }}
+      - name: Build lite-xl
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          sudo apt-get install -qq libsdl2-dev libfreetype6-dev meson
+          pushd lite-xl
+          meson setup build --buildtype=release --prefix="$HOME/.local"
+          ninja -C build install
+      - name: Generate lite-xl previews
+        run: |
+          pushd colors
+          mkdir -p "$LITE_XL_PREVIEW_OUTPUT" "previews"
+          SDL_VIDEODRIVER=dummy ../lite-xl/lite-xl .
+          mogrify -format png "$LITE_XL_PREVIEW_OUTPUT"/*.bmp
+          cp "$LITE_XL_PREVIEW_OUTPUT"/*.png previews
+          rm -r "$LITE_XL_PREVIEW_OUTPUT"
+      - name: create PR
+        uses: peter-evans/create-pull-request@v3
+        with:
+          commit-message: Update README.md and previews
+          branch: readme-ci
+          add-paths: README.md previews
+          delete-branch: false
+          title: '[CI] Update README.md and previews'
+          body: |
+            This is a CI that makes sure README.md and preview screenshots are updated.
+            Please check the [CI run][1] for logs.
+
+            [1]: https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}
