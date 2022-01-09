@@ -48,7 +48,6 @@ jobs:
           SDL_VIDEODRIVER=dummy lite-xl .
           mogrify -format png "$LITE_XL_PREVIEW_OUTPUT"/*.bmp
           rsync -uhva "$LITE_XL_PREVIEW_OUTPUT/*.png" previews
-          cp "$LITE_XL_PREVIEW_OUTPUT"/*.png previews
           rm -r "$LITE_XL_PREVIEW_OUTPUT"
       - name: create PR
         uses: peter-evans/create-pull-request@v3
