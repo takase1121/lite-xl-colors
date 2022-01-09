@@ -50,14 +50,14 @@ jobs:
           mkdir -p "$LITE_XL_PREVIEW_OUTPUT" "previews"
           SDL_VIDEODRIVER=dummy lite-xl .
           mogrify -format png "$LITE_XL_PREVIEW_OUTPUT"/*.bmp
-          rsync -auvh --include="*.png" --include="*/" --exclude="*" "$LITE_XL_PREVIEW_OUTPUT" previews
-          rm -r "$LITE_XL_PREVIEW_OUTPUT"
       - name: Generate Color Bars
         run: |
           pushd colors
-          find colors -type f -name "*.lua" -exec lua make_preview_image.lua {} \;
-          rsync -auvh --include "*_bars.png" --include="*/" --exclude="*" . previews
-          rm *.png
+          for f in colors/*.lua; do
+            lua make_preview_image.lua "$f" "$LITE_XL_PREVIEW_OUTPUT/${f%.lua}_bars.png"
+          done
+          cp -rv "$LITE_XL_PREVIEW_OUTPUT"/*.png previews
+          rm -r "$LITE_XL_PREVIEW_OUTPUT"
       - name: create PR
         uses: peter-evans/create-pull-request@v3
         with:
