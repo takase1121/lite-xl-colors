@@ -46,7 +46,6 @@ jobs:
           pushd colors
           mkdir -p "$LITE_XL_PREVIEW_OUTPUT" "previews"
           SDL_VIDEODRIVER=dummy lite-xl .
-          tree
           mogrify -format png "$LITE_XL_PREVIEW_OUTPUT"/*.bmp
           cp "$LITE_XL_PREVIEW_OUTPUT"/*.png previews
           rm -r "$LITE_XL_PREVIEW_OUTPUT"
@@ -55,6 +54,7 @@ jobs:
         with:
           commit-message: Update README.md and previews
           branch: readme-ci
+          path: colors
           add-paths: README.md previews
           delete-branch: false
           title: '[CI] Update README.md and previews'
