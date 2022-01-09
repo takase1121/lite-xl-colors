@@ -54,7 +54,7 @@ jobs:
         run: |
           pushd colors
           for f in colors/*.lua; do
-            lua make_preview_image.lua "$f" "$LITE_XL_PREVIEW_OUTPUT/${f%.lua}_bars.png"
+            lua make_preview_image.lua "colors/$f" "$LITE_XL_PREVIEW_OUTPUT/${f%.lua}_bars.png"
           done
           cp -rv "$LITE_XL_PREVIEW_OUTPUT"/*.png previews
           rm -r "$LITE_XL_PREVIEW_OUTPUT"
